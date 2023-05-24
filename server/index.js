@@ -19,10 +19,6 @@ const pgClient = new Pool({
 
 pgClient.on("error", () => console.log("Lost PG connection"));
 
-pgClient
-  .query("CREATE TABLE IF NOT EXISTS values (number INT)")
-  .catch((err) => console.log(err));
-
 // Redis Client Setup
 const redis = require("redis");
 const redisClient = redis.createClient({
@@ -53,7 +49,7 @@ app.get("/values/current", async (req, res) => {
 // Post a new value
 app.post("/values", async (req, res) => {
   const index = req.body.index;
-  if (parseInt(index) > 40) {
+  if (parseInt(index) > 100) {
     return res.status(422).send("Index too high");
   }
   redisClient.hset("values", index, "Nothing yet!");
@@ -62,6 +58,16 @@ app.post("/values", async (req, res) => {
   res.send({ working: true });
 });
 
-app.listen(5000, (err) => {
-  console.log("Listening");
-});
+pgClient.connect()
+  .then(() => pgClient.query("SELECT EXISTS(SELECT * FROM information_schema.tables WHERE table_name = 'values')"))
+  .then((result) => {
+    if (!result.rows[0].exists) {
+      return pgClient.query("CREATE TABLE values (number INT)");
+    }
+  })
+  .catch((err) => console.log(err))
+  .finally(() => {
+    app.listen(5000, (err) => {
+      console.log("Listening");
+    });
+  });
