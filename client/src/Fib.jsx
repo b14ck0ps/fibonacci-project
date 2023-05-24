@@ -28,9 +28,9 @@ const Fib = () => {
         if (isNaN(index) || index === "") {
             return alert("Please enter a valid number");
         }
-        // check if number is in the range of 0 to 40
-        if (index < 0 || index > 40) {
-            return alert("Please enter a number between 0 and 40");
+        // check if number is in the range of 0 to 100
+        if (index < 0 || index > 100) {
+            return alert("Please enter a number between 0 and 100");
         }
         //check if index already exists
         if (seenIndexes.find((seenIndex) => seenIndex.number === parseInt(index))) {
