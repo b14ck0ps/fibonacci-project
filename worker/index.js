@@ -11,11 +11,26 @@ const sub = redisClient.duplicate();
 
 // fib function
 function fib(index) {
-  if (index < 2) return 1;
-  return fib(index - 1) + fib(index - 2);
+  if (index <= 0) {
+    return 0;
+  } else if (index === 1) {
+    return 1;
+  } else {
+    let fibPrevPrev = 0;
+    let fibPrev = 1;
+    let fibCurrent = 0;
+
+    for (let i = 2; i <= index; i++) {
+      fibCurrent = fibPrev + fibPrevPrev;
+      fibPrevPrev = fibPrev;
+      fibPrev = fibCurrent;
+    }
+
+    return fibCurrent;
+  }
 }
 
-sub.on("message", (channel, message) => {
+sub.on("message", (_, message) => {
   redisClient.hset("values", message, fib(parseInt(message)));
 });
 
