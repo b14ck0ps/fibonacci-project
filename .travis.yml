@@ -1,0 +1,21 @@
+sudo:required
+services:
+  - docker
+
+before_install:
+  - docker build -t b14ck0ps/react-client -f Dockerfile.dev ./client/Dockerfile.dev ./client
+
+script: 'true'
+
+after_success:
+  - docker build -t b14ck0ps/multi-client ./client
+  - docker build -t b14ck0ps/multi-nginx ./nginx
+  - docker build -t b14ck0ps/multi-server ./server
+  - docker build -t b14ck0ps/multi-worker ./worker
+  # Log in to the docker CLI
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  # Push images to docker hub
+  - docker push b14ck0ps/multi-client
+  - docker push b14ck0ps/multi-nginx
+  - docker push b14ck0ps/multi-server
+  - docker push b14ck0ps/multi-worker
